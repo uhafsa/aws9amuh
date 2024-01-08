@@ -1,0 +1,79 @@
+Building & Deploying a fault tolerant Wordpress site on AWS CLOUD...
+
+Pre-requisites...
+
+(1) VPC
+(2) Security Group
+(2) S3-Bucket
+(3) Load Balancer
+(4) Auto-scaling
+(5) RDS- Maria-DB server
+(6) ROUTE53
+
+
+Step-1: create security-groups : 
+
+
+  (a) For RDS server: INBOUND- MySQL Aurora - 3306 , Custom MyIP ; OUTBOUND All traffic, Custom: Anywhere (name - DBsec-sg)
+
+  (b) For Webserver: INBOUND - ssh, Custom Anywhere; HTTP, Custom Anaywhere and Mysql Aurora (3306)..   (name - webserver-sg)
+
+
+Step-2: Create VPC = VPC & More
+
+
+Step-3: Create subnet groups in RDS
+
+
+Step-3: Create DB subnet-grp: Go to RDS-Dashboard >> Subnet groups >> select own creating VPC >> Availability zone :select two AZ >> Subnets: select two pvt. subnets (pvt1 & pvt2) 
+
+Step-4: Create an RDS database: 
+
+         > MariaDB engine >> Free tier >> Credentials settings: username: admin, passwd: admin123 >> select db.t2.micro >> VPC: select created VPC 
+
+
+        > Existing VPC security group: select: DBsec-sg
+
+
+        > Availability zone: select one
+
+        > Click on: Create database
+
+
+step-5: Launch EC2 instance-webserver (Amazon-Linux) with selecting own created VPC and security group (webserver-sg)
+
+
+Step-6: Take ssh-connection and run the script: 
+
+       > yum update -y
+       > yum install httpd php php-mysqli stress -y
+       > yum install mariadb105 -y
+       > cd /etc/httpd/conf  >> do 'ls'
+       > cp httpd.conf httpdconfbackup.conf >> do 'ls'
+       > rm -rf httpd.conf
+       > cd /var/www/html
+       > wget https://wordpress.org/latest.tar.gz >> do 'ls'
+       > tar -xzf latest.tar.gz (to extract the tar file)
+       > cp -rf wordpress/* /var/www/html
+       > rm -rf wordpress
+       > rm -rf latest.tar.gz
+       > chmod -R 755 wp-content
+       > chown -R apache.apache wp-content
+
+
+Step-7: Now Copy/paste httpd.conf (file shared by sir) file to nano /etc/httpd/conf/httpdconfbackup.conf
+
+
+Step-8: Connect the RDS server with the webserver 
+
+        > mysql -u admin -p -h endpint_of_rds.
+     
+
+
+
+
+
+
+
+
+
